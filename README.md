@@ -17,6 +17,6 @@ current problems/to do:
    -live updates for heat map accuracy
    -run it on a server?
 
-5) If using koopman DMD, find a rigorous way to determine observables
-6)  - PCA
+5) If using koopman DMD we may need to find more rigorous way of finding observables. Right now the paper uses the data itself and this should probably be fine
+    - PCA
     - autoencoders (?) <-is this gay?
