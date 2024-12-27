@@ -16,4 +16,7 @@ current problems/to do:
    -automatically update with current days price and add to dataset
    -live updates for heat map accuracy
    -run it on a server?
-   
+
+5) If using koopman DMD, find a rigorous way to determine observables
+6)  - PCA
+    - autoencoders (?) <-is this gay?
