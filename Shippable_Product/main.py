@@ -13,10 +13,10 @@ if __name__ == "__main__":
     #roll over the entire data set, and then average the success in a heat map for different values of
     # l and m
 
-    file_paths = ["cg_btc.csv", "cg_eth.csv", "cg_ltc.csv", "cg_xrp.csv"]
+    file_paths = ["cg_btc.csv", "cg_eth.csv", "cg_ltc.csv", "cg_xrp.csv", "cg_bnb.csv", "cg_bch.csv", "cg_link.csv", "cg_etc.csv"]
 
-    m_values = range(5, 15)
-    ell_values = range(1, 5)
+    m_values = range(1, 20)
+    ell_values = range(1, 9)
     threshold = 0.5
 
     results, hot_spots = rolling_heatmap.evaluate_hot_spots_rolling(

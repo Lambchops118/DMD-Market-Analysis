@@ -11,7 +11,22 @@ def dmd_predict(Phi, Lambda, b_last):
 
 #Compare signs of actual vs predicted next value. Returns fraction of correct sign predictions (between 0 and 1)
 def evaluate_directional_success(actual, predicted):
-    return np.mean(np.sign(actual) == np.sign(predicted))
+
+    # print("Actual:")
+    # print(actual)
+    # print("Predicted:")
+    # print(predicted.real)
+    #
+    # print("np mean np sign actual")
+    # print(np.mean(np.sign(actual)))
+    # print("np sign predicted")
+    # print(np.sign(predicted))
+
+    #input()
+    #editing this for only the real parts, as imaginary parts may be screwing up comparison
+    return np.mean(np.sign(actual) == np.sign(predicted.real))
+
+    #return np.mean(np.sign(actual) == np.sign(predicted))
 
 
 #rolling walk forecast across entire dataset for multiple m, ell combos
@@ -43,6 +58,9 @@ def evaluate_hot_spots_rolling(file_paths, m_values, ell_values, threshold=0.5):
                     c_ell = Lambda_ell * c0
                     predicted_log_return = Phi @ c_ell  # shape (n,)
 
+                    #debug for transient eigenvalues
+                    predicted_log_return = predicted_log_return.real
+
                     actual_day = t + m - 1 + ell
                     if actual_day < T:
                         actual_log_return = data_matrix[:, actual_day]  # shape (n,)
@@ -50,6 +68,14 @@ def evaluate_hot_spots_rolling(file_paths, m_values, ell_values, threshold=0.5):
                                                            predicted_log_return)
                         successes += sr * n  # sr is fraction among n cryptos
                         total_checks += n
+
+                        #print("predicted log return in value")
+                        #print(predicted_log_return)
+
+                        #print("actual log return in value ")
+                        #print(actual_log_return)
+                        #input()
+
                 except np.linalg.LinAlgError:
                     # Skip if rank-deficient
                     pass

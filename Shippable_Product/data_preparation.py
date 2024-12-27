@@ -38,14 +38,23 @@ def load_log_return_matrix(file_paths):
         else:
             log_returns = np.array([])
 
+
         aligned_data.append(log_returns)
 
     # 3) Truncate all to the same length
     min_length = min(len(lr) for lr in aligned_data if len(lr) > 0)
     truncated_data = [lr[:min_length] for lr in aligned_data]
 
+
+
     # 4) Stack into (n, T)
     data_matrix = np.array(truncated_data)
+
+    #debug to show all arrays are of same length
+    for i, inner_array in enumerate(data_matrix):
+        print(f"Length of array {i}: {len(inner_array)}")
+    #input()
+
     return data_matrix  # shape (n, T)
 
 def load_and_prepare_data_single_step(file_paths):
@@ -126,5 +135,10 @@ def load_and_prepare_data_single_step(file_paths):
     # 6) Build X1, X2 for single-step shift
     X1 = data_matrix[:, :-1]  # shape (n, T-1)
     X2 = data_matrix[:, 1:]   # shape (n, T-1)
+
+    print("DEBUGGGGGGGG")
+    print(X1)
+    print(X2)
+    input()
 
     return X1, X2, truncated_prices

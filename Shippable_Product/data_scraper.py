@@ -103,7 +103,7 @@ def main():
 
             print(f"Downloading {date_file}...")
             download_file(file_url, local_file_path)
-            
+
             print(f"Downloading checksum for {date_file}...")
             download_checksum(checksum_url, checksum_file_path)
 
