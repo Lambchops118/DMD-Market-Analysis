@@ -5,6 +5,7 @@ import dmd_functions
 import data_preparation
 import matplotlib.pyplot as plt
 
+#Predict next state of mode matrix
 def dmd_predict(Phi, Lambda, b_last):
     return Phi @ (np.diag(Lambda) @ b_last)
 
@@ -12,20 +13,8 @@ def dmd_predict(Phi, Lambda, b_last):
 #Compare signs of actual vs predicted next value. Returns fraction of correct sign predictions (between 0 and 1)
 def evaluate_directional_success(actual, predicted):
 
-    # print("Actual:")
-    # print(actual)
-    # print("Predicted:")
-    # print(predicted.real)
-    #
-    # print("np mean np sign actual")
-    # print(np.mean(np.sign(actual)))
-    # print("np sign predicted")
-    # print(np.sign(predicted))
-
-    #input()
     #editing this for only the real parts, as imaginary parts may be screwing up comparison
     return np.mean(np.sign(actual) == np.sign(predicted.real))
-
     #return np.mean(np.sign(actual) == np.sign(predicted))
 
 

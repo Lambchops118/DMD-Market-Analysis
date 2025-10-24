@@ -19,10 +19,7 @@ if __name__ == "__main__":
     ell_values  = range(1, 9)
     threshold   = 0.5
 
-    results, hot_spots = rolling_heatmap.evaluate_hot_spots_rolling(
-        file_paths, m_values, ell_values, threshold=threshold
-    )
-
+    results, hot_spots = rolling_heatmap.evaluate_hot_spots_rolling(file_paths, m_values, ell_values, threshold=threshold)
 
     #chatgpt:
     print("\nAll Results (rolling forecast):")
