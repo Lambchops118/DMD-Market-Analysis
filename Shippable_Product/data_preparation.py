@@ -1,61 +1,40 @@
 import numpy as np
 import pandas as pd
 
-def load_log_return_matrix(file_paths):
-    all_data        = []
-    start_dates     = []
-    original_prices = []
+def load_log_return_matrix(file_paths, how="inner", fill=None):
+    import pandas as pd, numpy as np
 
-    # 1) Read each file, record earliest data, compute daily means, store raw prices
-    for file_path in file_paths:
-        df = pd.read_csv(file_path)
-        if 'snapped_at' not in df.columns or 'price' not in df.columns:
-            raise ValueError(f"File {file_path} missing 'snapped_at' or 'price'.")
+    # Load each series as daily mean without dropping NaNs yet
+    daily_series = []
+    for p in file_paths:
+        df = pd.read_csv(p)
+        if {'snapped_at','price'} - set(df.columns):
+            raise ValueError(f"{p} missing 'snapped_at' or 'price'")
+        s = (df.assign(snapped_at=pd.to_datetime(df['snapped_at']))
+                .sort_values('snapped_at')
+                .set_index('snapped_at')['price']
+                .resample('D').mean())
+        daily_series.append(s.rename(p))
 
-        df['snapped_at']  = pd.to_datetime(df['snapped_at'])
-        df                = df.sort_values(by='snapped_at')
-        df_daily          = df.set_index('snapped_at').resample('D').mean()
+    # Combine into one DataFrame with a common date axis
+    prices = pd.concat(daily_series, axis=1, join='outer')
+    if fill == "ffill":
+        prices = prices.ffill()
+    elif fill == "bfill":
+        prices = prices.bfill()
 
-        start_dates.append(df_daily.index.min())
+    # Choose alignment policy
+    if how == "inner":
+        prices = prices.dropna(how='any')
+    elif how == "outer":
+        pass  # keep NaNs if you plan to impute differently
+    else:
+        raise ValueError("how must be 'inner' or 'outer'")
 
-        prices = df_daily['price'].dropna().values
-        original_prices.append(prices)
-
-    # 2) Align from the latest common start date
-    common_start_date = max(start_dates)
-    aligned_data      = []
-
-    for file_path, orig_price in zip(file_paths, original_prices):
-        df               = pd.read_csv(file_path)
-        df['snapped_at'] = pd.to_datetime(df['snapped_at'])
-        df               = df.sort_values(by='snapped_at')
-        df_daily         = df.set_index('snapped_at').resample('D').mean()
-        df_daily         = df_daily[df_daily.index >= common_start_date]
-        prices           = df_daily['price'].dropna().values
-
-        if len(prices) > 1:
-            log_returns = np.log(prices[1:] / prices[:-1])
-        else:
-            log_returns = np.array([])
-
-
-        aligned_data.append(log_returns)
-
-    # 3) Truncate all to the same length
-    min_length      = min(len(lr) for lr in aligned_data if len(lr) > 0)
-    truncated_data  = [lr[:min_length] for lr in aligned_data]
-
-
-
-    # 4) Stack into (n, T)
-    data_matrix = np.array(truncated_data)
-
-    #debug to show all arrays are of same length
-    for i, inner_array in enumerate(data_matrix):
-        print(f"Length of array {i}: {len(inner_array)}")
-    #input()
-
-    return data_matrix  # shape (n, T)
+    # Compute log-returns on the aligned grid
+    logret      = np.log(prices/prices.shift(1)).dropna(how='any')
+    data_matrix = logret.to_numpy().T  # (n, T)
+    return data_matrix
 
 def load_and_prepare_data_single_step(file_paths):
     """
