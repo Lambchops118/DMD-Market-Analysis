@@ -1,9 +1,9 @@
 #functions that deal with rolling forecast stuff
-import numpy as np
-import matplotlib.pyplot as plt
 
-import data_preparation
+import numpy as np
 import dmd_functions
+import data_preparation
+import matplotlib.pyplot as plt
 
 def dmd_predict(Phi, Lambda, b_last):
     return Phi @ (np.diag(Lambda) @ b_last)
@@ -32,12 +32,13 @@ def evaluate_directional_success(actual, predicted):
 #rolling walk forecast across entire dataset for multiple m, ell combos
 def evaluate_hot_spots_rolling(file_paths, m_values, ell_values, threshold=0.5):
     data_matrix = data_preparation.load_log_return_matrix(file_paths)  # shape (n, T)
-    n, T = data_matrix.shape
+    n, T        = data_matrix.shape
+
     results = {}
 
     for m in m_values:
         for ell in ell_values:
-            successes = 0
+            successes    = 0
             total_checks = 0
 
             # t: start index of the window
@@ -53,9 +54,9 @@ def evaluate_hot_spots_rolling(file_paths, m_values, ell_values, threshold=0.5):
                 try:
                     Phi, Lambda, b_last = dmd_functions.dmd_decomposition_rolling(X1, X2)
                     # Repeated application of diag(Lambda) for 'ell' steps
-                    c0 = b_last
-                    Lambda_ell = Lambda ** ell
-                    c_ell = Lambda_ell * c0
+                    c0                   = b_last
+                    Lambda_ell           = Lambda ** ell
+                    c_ell                = Lambda_ell * c0
                     predicted_log_return = Phi @ c_ell  # shape (n,)
 
                     #debug for transient eigenvalues
@@ -64,9 +65,8 @@ def evaluate_hot_spots_rolling(file_paths, m_values, ell_values, threshold=0.5):
                     actual_day = t + m - 1 + ell
                     if actual_day < T:
                         actual_log_return = data_matrix[:, actual_day]  # shape (n,)
-                        sr = evaluate_directional_success(actual_log_return,
-                                                           predicted_log_return)
-                        successes += sr * n  # sr is fraction among n cryptos
+                        sr = evaluate_directional_success(actual_log_return, predicted_log_return)
+                        successes    += sr * n  # sr is fraction among n cryptos
                         total_checks += n
 
                         #print("predicted log return in value")
@@ -85,7 +85,7 @@ def evaluate_hot_spots_rolling(file_paths, m_values, ell_values, threshold=0.5):
                 continue
 
             overall_success_rate = successes / total_checks
-            results[(m, ell)] = overall_success_rate
+            results[(m, ell)]    = overall_success_rate
 
     # hot_spots
     hot_spots = {k: v for k, v in results.items() if v >= threshold}
@@ -96,7 +96,7 @@ def plot_hot_spots(results):
         print("No results to plot.")
         return
 
-    m_values = sorted(set(k[0] for k in results.keys()))
+    m_values   = sorted(set(k[0] for k in results.keys()))
     ell_values = sorted(set(k[1] for k in results.keys()))
 
     # Build heatmap array

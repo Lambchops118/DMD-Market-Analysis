@@ -1,23 +1,23 @@
 #Main file for rolling walk DMD program. Takes in stock data, does DMD, returns next predicted value (daily)
 #and then "rolls" across entire dataset to create heatman of m and l values and shows their successes (avg)
-import numpy as np
-import matplotlib.pyplot as plt
 
+
+import numpy as np
+import dmd_functions
 import rolling_heatmap
 import data_preparation
 import single_step_forecast
-import dmd_functions
+import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
 
     #roll over the entire data set, and then average the success in a heat map for different values of
     # l and m
 
-    file_paths = ["cg_btc.csv", "cg_eth.csv", "cg_ltc.csv", "cg_xrp.csv", "cg_bnb.csv", "cg_bch.csv", "cg_link.csv", "cg_etc.csv"]
-
-    m_values = range(1, 20)
-    ell_values = range(1, 9)
-    threshold = 0.5
+    file_paths  = ["cg_btc.csv", "cg_eth.csv", "cg_ltc.csv", "cg_xrp.csv", "cg_bnb.csv", "cg_bch.csv", "cg_link.csv", "cg_etc.csv"]
+    m_values    = range(1, 20)
+    ell_values  = range(1, 9)
+    threshold   = 0.5
 
     results, hot_spots = rolling_heatmap.evaluate_hot_spots_rolling(
         file_paths, m_values, ell_values, threshold=threshold
